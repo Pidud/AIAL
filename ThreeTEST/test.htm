@@ -17,18 +17,60 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 
-			var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-			var cube = new THREE.Mesh( geometry, material );
-			scene.add( cube );
+			const houseMaterial = new THREE.MeshBasicMaterial({
+				color: CE3131
+			});
+
+			// instantiate a loader
+	var loader = new THREE.OBJLoader();
+
+	// load a resource
+	loader.load(
+		// resource URL
+		'ThreeTEST/models/Iphone seceond version finished.obj',
+		// called when resource is loaded
+		function ( object ) {
+
+			scene.add( object );
+
+			object.materials = houseMaterial;
+
+		},
+		// called when loading is in progresses
+		function ( xhr ) {
+
+			console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+		},
+		// called when loading has errors
+		function ( error ) {
+
+			console.log( 'An error happened' );
+
+		}
+	);
+
+	// create a point light
+const pointLight =
+  new THREE.PointLight(0xFFFFFF);
+
+// set its position
+pointLight.position.x = 10;
+pointLight.position.y = 50;
+pointLight.position.z = 130;
+
+// add to the scene
+scene.add(pointLight);
+
+var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
 
 			camera.position.z = 5;
 
 			var animate = function () {
 				requestAnimationFrame( animate );
-
-				cube.rotation.x += 0.01;
-				cube.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 			};
