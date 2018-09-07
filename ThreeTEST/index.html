@@ -9,9 +9,11 @@
 	</head>
 	<body>
 		<script src="js/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script>
 				var scene = new THREE.Scene();
-				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 100000 );
 
 				var renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -24,25 +26,34 @@
 				var cube = new THREE.Mesh( geometry, material );
 				scene.add( cube );
 				*/
+				//materials
+				var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+
 				//Models
 				var loader = new THREE.ObjectLoader();
-				loader.load('models/TestWorker/assembly-1.json', handle_load);
+				//loader.load('models/TestWorker/assembly-1.json', handle_load);
 
 				function handle_load (mesh){
+					
 					scene.add(mesh);
 				}
+
+				var objLoader = new THREE.OBJLoader();
+
+				objLoader.load('models/247_House 15_obj.obj', handle_load);
 
 				//lights
 				var light =  new THREE.AmbientLight(0xffffff, 0.5);
 				scene.add(light);
 
-				camera.position.z = 5;
+				//controls
+				var controls = new THREE.OrbitControls(camera);
+				camera.position.z = 1000;
+				controls.update();
 
 				var animate = function () {
 					requestAnimationFrame( animate );
-
-					camera.position.z -= 0.01;
-
+					controls.update();
 					renderer.render( scene, camera );
 				};
 
