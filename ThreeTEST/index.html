@@ -11,6 +11,7 @@
 		<script src="js/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
 		<script>
 				var scene = new THREE.Scene();
 				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 100000 );
@@ -27,28 +28,39 @@
 				scene.add( cube );
 				*/
 				//materials
-				var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
-				//Models
-				var loader = new THREE.ObjectLoader();
-				//loader.load('models/TestWorker/assembly-1.json', handle_load);
+				var geometry = mew THREE.PlaneGeometry(10,10);
 
 				function handle_load (mesh){
-					
+
 					scene.add(mesh);
 				}
 
-				var objLoader = new THREE.OBJLoader();
+				var loader = new THREE.OBJLoader();
+				var mtlLoader = new THREE.MTLLoader();
 
-				objLoader.load('models/247_House 15_obj.obj', handle_load);
+				//loader.load('models/treehouse/wooden watch tower2.obj', handle_load);
+
+				mtlLoader.setPath('models/treehouse/');
+				mtlLoader.load('/wooden watch tower2.mtl',
+				 function(object){
+					 object.preload
+					 loader.setMaterials(object);
+					 loader.load('models/treehouse/wooden watch tower2.obj', function(mesh){
+						 scene.add(mesh);
+						 mesh.position.y = -5;
+					 });
+				 });
+
+
 
 				//lights
-				var light =  new THREE.AmbientLight(0xffffff, 0.5);
+				var light =  new THREE.AmbientLight(0xffffff, 1);
 				scene.add(light);
 
 				//controls
 				var controls = new THREE.OrbitControls(camera);
-				camera.position.z = 1000;
+				camera.position.z = 10;
 				controls.update();
 
 				var animate = function () {
