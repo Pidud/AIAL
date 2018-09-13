@@ -13,10 +13,14 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script>
+
+				var pi = 3.14159;
+
 				var scene = new THREE.Scene();
 				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 100000 );
 
 				var renderer = new THREE.WebGLRenderer();
+				renderer.shadowMap.enabled = true;
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -29,7 +33,14 @@
 				*/
 				//materials
 
-				var geometry = mew THREE.PlaneGeometry(10,10);
+				var geometry = new THREE.PlaneGeometry(10,10, 32, 32);
+				var material =  new THREE.MeshPhongMaterial();
+				var plane = new THREE.Mesh(geometry, material);
+				plane.rotation.x = -pi / 2;
+				plane.position.y = -4
+				plane.recieveShadow = true;
+				scene.add(plane);
+
 
 				function handle_load (mesh){
 
@@ -49,14 +60,27 @@
 					 loader.load('models/treehouse/wooden watch tower2.obj', function(mesh){
 						 scene.add(mesh);
 						 mesh.position.y = -5;
+						 mesh.castShadow = true;
+						 mesh.recieveShadow = true;
 					 });
 				 });
 
 
 
 				//lights
-				var light =  new THREE.AmbientLight(0xffffff, 1);
-				scene.add(light);
+				var spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight.position.set( 10, 100, 10 );
+
+				spotLight.castShadow = true;
+
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+
+				spotLight.shadow.camera.near = 500;
+				spotLight.shadow.camera.far = 4000;
+				spotLight.shadow.camera.fov = 30;
+
+				scene.add( spotLight );
 
 				//controls
 				var controls = new THREE.OrbitControls(camera);
