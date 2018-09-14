@@ -15,10 +15,12 @@
 		<script>
 
 				var pi = 3.14159;
+				var objects = [];
 
 				var scene = new THREE.Scene();
 				var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 100000 );
-
+				var mouse =  new THREE.Vector2();
+				var raycaster = new THREE.Raycaster();
 				var renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -33,9 +35,9 @@
 				*/
 				//materials
 
-				var geometry = new THREE.PlaneGeometry(10,10, 32, 32);
+				var planeGeometry = new THREE.PlaneGeometry(10,10, 32, 32);
 				var material =  new THREE.MeshPhongMaterial();
-				var plane = new THREE.Mesh(geometry, material);
+				var plane = new THREE.Mesh(planeGeometry, material);
 				plane.rotation.x = -pi / 2;
 				plane.position.y = -4
 				plane.recieveShadow = true;
@@ -86,6 +88,26 @@
 				var controls = new THREE.OrbitControls(camera);
 				camera.position.z = 10;
 				controls.update();
+
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+				function onDocumentMouseDown(event){
+
+					event.preventDefault();
+					mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+					mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+					raycaster.setFromCamera( mouse, camera );
+					var intersects = raycaster.intersectObjects( scene.children );
+
+					if (intersects.length > 0) {
+
+						var intersect = intersects[0];
+						var plane = new THREE.Mesh(planeGeometry, material);
+						scene.add(plane);
+						plane.position.copy(intersect.point);
+						plane.rotation.copy(camera.rotation);
+					}
+				}
 
 				var animate = function () {
 					requestAnimationFrame( animate );
