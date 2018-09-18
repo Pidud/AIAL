@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first three.js app</title>
+		<style>
+			body{
+            margin: 0;
+            background-color: #ebeef1;
+          }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/loaders/STLLoader.js"></script>
+		<script>
+      //initialize important objects
+      var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100000);
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color( #ebeef1 );
+      var renderer = new THREE.WebGLRenderer();
+      var controls = new THREE.OrbitControls(camera);
+      camera.position.z = 10;
+      controls.update();
+
+      //create geometry
+      var geometry, material, cube
+      material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+      geometry = new THREE.CubeGeometry(1,1,1);
+      cube = new THREE.Mesh(geometry, material);
+
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+
+      var animate = function () {
+        requestAnimationFrame( animate );
+        controls.update();
+        renderer.render( scene, camera );
+      };
+
+      animate();
+		</script>
+	</body>
+</html>
