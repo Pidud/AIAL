@@ -19,21 +19,58 @@
       //initialize important objects
       var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100000);
       var scene = new THREE.Scene();
-      scene.background = new THREE.Color( #ebeef1 );
       var renderer = new THREE.WebGLRenderer();
+			renderer.shadowMap.enabled = true;
+			//control settings
       var controls = new THREE.OrbitControls(camera);
       camera.position.z = 10;
       controls.update();
 
-      //create geometry
-      var geometry, material, cube
-      material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-      geometry = new THREE.CubeGeometry(1,1,1);
-      cube = new THREE.Mesh(geometry, material);
+			//setting background color to Alice Blue
+			scene.background = new THREE.Color( 0xc8cace);
 
-      renderer.setSize( window.innerWidth, window.innerHeight );
+			//set up renderer settings
+			renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
 
+      //creates a cube of a color and adds it to the scene
+			function createBoxGeometry(color){
+				var material, mesh;
+	      material = new THREE.MeshStandardMaterial( {color: color} );
+				var geometry = new THREE.BoxGeometry(1, 1, 1);
+				mesh = new THREE.Mesh(geometry, material);
+				mesh.position.z = 1;
+				mesh.castShadow = true;
+				mesh.recieveShadow = true;
+				scene.add(mesh);
+			}
+			createBoxGeometry(0xc8cace);
+
+			function createPlaneGeometry(color){
+				var material, mesh;
+				material = new THREE.MeshStandardMaterial( {color: color} );
+				var geometry = new THREE.PlaneGeometry(10, 10, 10);
+				mesh = new THREE.Mesh(geometry, material);
+				mesh.castShadow = true;
+				mesh.recieveShadow = true;
+				scene.add(mesh);
+			}
+
+			createPlaneGeometry(0xc8cace);
+
+			//creates a light of a specified color and add it to the scene
+			function createLight(color, intensity){
+				var light = new THREE.PointLight(color, intensity, 0);
+				light.position.x = 10;
+				light.position.y = 10;
+				light.position.z = 10;
+				light.castShadow = true;
+				scene.add(light);
+			}
+
+			createLight(0xffffff, 1);
+
+			//final animate function
       var animate = function () {
         requestAnimationFrame( animate );
         controls.update();
