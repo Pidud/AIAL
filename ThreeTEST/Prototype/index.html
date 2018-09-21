@@ -14,13 +14,16 @@
 	<body>
 		<script src="js/three.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
-    <script src="js/loaders/STLLoader.js"></script>
+    <script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
 		<script>
       //initialize important objects
       var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100000);
       var scene = new THREE.Scene();
       var renderer = new THREE.WebGLRenderer();
 			renderer.shadowMap.enabled = true;
+			var loaderMTL = new THREE.MTLLoader();
+			var loaderOBJ = new THREE.OBJLoader();
 			//control settings
       var controls = new THREE.OrbitControls(camera);
       camera.position.z = 10;
@@ -33,19 +36,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
 
-      //creates a cube of a color and adds it to the scene
-			function createBoxGeometry(color){
-				var material, mesh;
-	      material = new THREE.MeshStandardMaterial( {color: color} );
-				var geometry = new THREE.BoxGeometry(1, 1, 1);
-				mesh = new THREE.Mesh(geometry, material);
-				mesh.position.z = 1;
-				mesh.castShadow = true;
-				mesh.recieveShadow = true;
-				scene.add(mesh);
-			}
-			createBoxGeometry(0xc8cace);
-
+			//functions to autmatically load in geometries
 			function createPlaneGeometry(color){
 				var material, mesh;
 				material = new THREE.MeshStandardMaterial( {color: color} );
@@ -57,6 +48,26 @@
 			}
 
 			createPlaneGeometry(0xc8cace);
+
+			//function to load OBJ and its MTL file
+			function loadOBJ (position, objPath, mtlPath) {
+				loaderMTL.load(mtlPath,
+					function(object){
+						object.preload
+						loaderOBJ.setMaterials(object);
+					}
+				);
+				loaderOBJ.load(objPath,
+					function(object){
+						object.preload;
+						object.position.copy(position);
+						object.rotation.x = 3.14/2;
+						scene.add(object)
+					}
+				);
+			}
+
+			loadOBJ(new THREE.Vector3(0,0,0), 'PrototypeModels/wooden watch tower2.obj', '/PrototypeModels/wooden watch tower2.mtl');
 
 			//creates a light of a specified color and add it to the scene
 			function createLight(color, intensity){
