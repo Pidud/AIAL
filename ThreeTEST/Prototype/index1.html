@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first three.js app</title>
+		<style>
+			body{
+            margin: 0;
+            background-color: #ebeef1;
+          }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/OutlinePass.js"></script>
+		<script>
+
+			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
+
+      //initialize important objects
+      var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100000);
+      var scene = new THREE.Scene();
+      var renderer = new THREE.WebGLRenderer();
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.BasicShadowMap;
+			var loaderMTL = new THREE.MTLLoader();
+			var loaderOBJ = new THREE.OBJLoader();
+			//control settings
+      var controls = new THREE.OrbitControls(camera);
+      camera.position.z = 10;
+      controls.update();
+
+			//setting background color to Alice Blue
+			scene.background = new THREE.Color( 0xc8cace);
+
+			//set up renderer settings
+			renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+
+			//functions to autmatically load in geometries
+			function createPlaneGeometry(color){
+				var material, mesh;
+				material = new THREE.MeshPhongMaterial( {color: color} );
+				var geometry = new THREE.PlaneGeometry(10, 10, 10);
+				mesh = new THREE.Mesh(geometry, material);
+				mesh.position.z = -1;
+				mesh.traverse(function(object){
+					if(object instanceof THREE.Mesh){
+						object.castShadow = true;
+						object.recieveShadow = true;
+					}
+				})
+				scene.add(mesh);
+			}
+
+			createPlaneGeometry(0x2a5599);
+
+			var material, mesh;
+			material = new THREE.MeshLambertMaterial( {color: 0x0ff0ff} );
+			var geometry = new THREE.CubeGeometry(2, 2, 2);
+			mesh = new THREE.Mesh(geometry, material);
+			mesh.traverse(function(object){
+				if(object instanceof THREE.Mesh){
+					object.castShadow = true;
+					object.recieveShadow = true;
+				}
+			})
+			scene.add(mesh);
+
+			//function to load OBJ and its MTL file
+			function loadOBJ (position, objPath, mtlPath) {
+				loaderMTL.load(mtlPath,
+					function(object){
+						object.preload
+						loaderOBJ.setMaterials(object);
+					}
+				);
+				loaderOBJ.load(objPath,
+					function(object){
+						object.preload;
+						object.position.copy(position);
+						object.rotation.x = 3.14/2;
+						object.traverse(function(object){
+							if(object instanceof THREE.Mesh){
+								object.castShadow = true;
+								object.recieveShadow = true;
+							}
+						})
+						scene.add(object)
+					}
+				);
+			}
+
+			loadOBJ(new THREE.Vector3(0,0,0), 'PrototypeModels/wooden watch tower2.obj', '/PrototypeModels/wooden watch tower2.mtl');
+
+			//creates a light of a specified color and add it to the scene
+			function createLight(color, intensity, position){
+				var light = new THREE.PointLight(color, intensity, 0);
+				light.position.copy(position);
+				light.castShadow = true;
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+				light.shadow.bias = 0.0001;
+				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
+				light.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
+				scene.add(light);
+			}
+
+			createLight(0xffffff, 1, new THREE.Vector3(10,10,10));
+
+			var ambLight = new THREE.AmbientLight(0x444444 , 0.2);
+			scene.add(ambLight);
+
+			//final animate function
+      var animate = function () {
+        requestAnimationFrame( animate );
+        controls.update();
+        renderer.render( scene, camera );
+				console.log(camera.position);
+      };
+
+      animate();
+		</script>
+	</body>
+</html>
